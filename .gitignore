@@ -1,0 +1,15 @@
+__pycache__/
+*.py[cod]
+*$py.class
+env/
+venv/
+.venv/
+/rl-dev/
+*.pth
+*.pt
+checkpoints/*
+!checkpoints/.gitkeep
+*.mp4
+*.avi
+!assets/*.gif
+!assets/*.png
