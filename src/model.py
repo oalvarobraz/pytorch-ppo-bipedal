@@ -31,7 +31,7 @@ class ActorCritic(nn.Module):
         
         # O desvio padrão (sigma) deve ser sempre positivo.
         # Usamos Softplus para transformar qualquer número em um valor > 0.
-        sigma = self.softplus(self.sigma_head(a))
+        sigma = self.softplus(self.sigma_head(a)) + 1e-5
         
         # Processamento do Crítico-
         v = F.relu(self.critic_fc1(x))

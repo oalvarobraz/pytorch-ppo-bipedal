@@ -88,6 +88,7 @@ class PPOAgent:
 
             self.otimizador.zero_grad()
             perda_total.backward()
+            nn.utils.clip_grad_norm_(self.modelo.parameters(), max_norm=0.5)
             self.otimizador.step()
 
         self.limpar_memoria()

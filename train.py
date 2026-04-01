@@ -9,12 +9,13 @@ from src.agent import PPOAgent
 def main():
     print("Iniciando o Treinamento do BipedalWalker (PPO)...")
 
+    caminho_drive = "/content/drive/MyDrive/Bipedal_PPO"
+    os.makedirs(caminho_drive, exist_ok=True)
+    caminho_salvamento = os.path.join(caminho_drive, "ppo_bipedal.pth")
+
     if torch.cuda.is_available():
         device = torch.device("cuda")
         print("Aceleração CUDA ativada!")
-    elif torch.backends.mps.is_available():
-        device = torch.device("mps")
-        print("Aceleração MPS (Apple Silicon) ativada!")
     else:
         device = torch.device("cpu")
         print("Rodando na CPU.")
@@ -24,6 +25,11 @@ def main():
     num_motores = env.action_space.shape[0]
 
     modelo = ActorCritic(num_inputs=num_sensores, num_actions=num_motores)
+    
+    if os.path.exists(caminho_salvamento):
+        modelo.load_state_dict(torch.load(caminho_salvamento))
+        print("Pesos recuperados do Drive! Continuando o treinamento...")
+
     agente = PPOAgent(
         modelo=modelo,
         lr_ator=3e-4,
@@ -34,12 +40,9 @@ def main():
         device=device
     )
 
-    EPISODIOS = 5000
+    EPISODIOS = 10000 
     historico_pontuacoes = []
     
-    os.makedirs('checkpoints', exist_ok=True)
-    caminho_salvamento = "checkpoints/ppo_bipedal.pth"
-
     for episodio in range(1, EPISODIOS + 1):
         estado, info = env.reset()
         done = False
@@ -47,12 +50,10 @@ def main():
 
         while not done:
             acao, log_prob, valor = agente.agir(estado)
-            
             proximo_estado, recompensa, finalizado, truncado, info = env.step(acao)
             done = finalizado or truncado
             
             agente.lembrar(estado, acao, log_prob, recompensa, done, valor)
-            
             pontuacao_episodio += recompensa
             estado = proximo_estado
 
@@ -61,14 +62,15 @@ def main():
         historico_pontuacoes.append(pontuacao_episodio)
         media_100 = np.mean(historico_pontuacoes[-100:]) if len(historico_pontuacoes) >= 100 else np.mean(historico_pontuacoes)
 
-        print(f"Episódio: {episodio}/{EPISODIOS} | Pontuação: {pontuacao_episodio:.1f} | Média(100): {media_100:.1f}")
+        if episodio % 10 == 0:
+            print(f"Episódio: {episodio}/{EPISODIOS} | Pts: {pontuacao_episodio:.1f} | Média(100): {media_100:.1f}")
 
-        if episodio % 500 == 0:
+        if episodio % 100 == 0:
             torch.save(agente.modelo.state_dict(), caminho_salvamento)
-            print(f"Checkpoint salvo no episódio {episodio}!")
+            print(f"Backup salvo no Drive: {caminho_salvamento}")
         
         if media_100 >= 300:
-            print(f"Vitória! O robô aprendeu a andar como um humano no episódio {episodio}!")
+            print(f"O robô atingiu a maestria no episódio {episodio}!")
             torch.save(agente.modelo.state_dict(), caminho_salvamento)
             break
 
