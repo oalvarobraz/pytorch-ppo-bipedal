@@ -40,8 +40,10 @@ def main():
         device=device
     )
 
-    EPISODIOS = 10000 
+    EPISODIOS = 10000
     historico_pontuacoes = []
+    melhor_media = -float('inf')
+    caminho_campeao = os.path.join(caminho_drive, "ppo_bipedal_campeao.pth")
     
     for episodio in range(1, EPISODIOS + 1):
         estado, info = env.reset()
@@ -67,6 +69,11 @@ def main():
         if episodio % 10 == 0:
             print(f"Episódio: {episodio}/{EPISODIOS} | Pts: {pontuacao_episodio:.1f} | Média(100): {media_100:.1f}")
 
+        if media_100 > melhor_media and media_100 > 50:
+            melhor_media = media_100
+            torch.save(agente.modelo.state_dict(), caminho_campeao)
+            print(f"NOVO RECORDE: {melhor_media:.1f}! Cérebro do Campeão salvo no Drive!")
+            
         if episodio % 100 == 0:
             torch.save(agente.modelo.state_dict(), caminho_salvamento)
             print(f"Backup salvo no Drive: {caminho_salvamento}")
