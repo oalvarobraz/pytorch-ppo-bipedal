@@ -59,6 +59,8 @@ def main():
 
         agente.treinar()
 
+        agente.decair_lr(episodio, EPISODIOS)
+
         historico_pontuacoes.append(pontuacao_episodio)
         media_100 = np.mean(historico_pontuacoes[-100:]) if len(historico_pontuacoes) >= 100 else np.mean(historico_pontuacoes)
 

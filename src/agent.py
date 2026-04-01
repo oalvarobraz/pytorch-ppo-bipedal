@@ -13,6 +13,9 @@ class PPOAgent:
             {'params': [p for n, p in modelo.named_parameters() if 'actor' in n or 'mu' in n or 'sigma' in n], 'lr': lr_ator},
             {'params': [p for n, p in modelo.named_parameters() if 'critic' in n or 'value' in n], 'lr': lr_critico}
         ])
+
+        self.lr_ator_inicial = lr_ator
+        self.lr_critico_inicial = lr_critico
         
         self.gamma = gamma
         self.clip_epsilon = clip_epsilon
@@ -34,6 +37,14 @@ class PPOAgent:
 
     def limpar_memoria(self):
         self.memoria = []
+
+    def decair_lr(self, passo_atual, max_passos):
+        fracao = 1.0 - (passo_atual - 1.0) / max_passos
+        
+        fracao = max(fracao, 0.1)
+        
+        self.otimizador.param_groups[0]['lr'] = self.lr_ator_inicial * fracao
+        self.otimizador.param_groups[1]['lr'] = self.lr_critico_inicial * fracao
 
     def treinar(self):
         if len(self.memoria) == 0:
