@@ -54,6 +54,11 @@ def main():
             acao, log_prob, valor = agente.agir(estado)
             proximo_estado, recompensa, finalizado, truncado, info = env.step(acao)
             done = finalizado or truncado
+
+            velocidade_x = proximo_estado[2]
+            
+            if velocidade_x < 0.1:
+                recompensa -= 0.5
             
             agente.lembrar(estado, acao, log_prob, recompensa, done, valor)
             pontuacao_episodio += recompensa
