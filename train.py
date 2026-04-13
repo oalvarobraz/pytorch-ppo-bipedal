@@ -57,8 +57,11 @@ def main():
 
             velocidade_x = proximo_estado[2]
             
-            if velocidade_x < 0.1:
-                recompensa -= 0.5
+            if velocidade_x < 0.05:
+                recompensa -= 0.1
+            
+            if recompensa <= -100:
+                recompensa = -500
             
             agente.lembrar(estado, acao, log_prob, recompensa, done, valor)
             pontuacao_episodio += recompensa

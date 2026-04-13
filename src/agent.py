@@ -95,7 +95,7 @@ class PPOAgent:
             
             entropia = dist.entropy().mean()
             
-            perda_total = perda_ator + (0.5 * perda_critico) - (0.05 * entropia)
+            perda_total = perda_ator + (0.5 * perda_critico) - (0.02 * entropia)
             
             self.otimizador.zero_grad()
             perda_total.backward()
