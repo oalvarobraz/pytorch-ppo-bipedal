@@ -13,3 +13,4 @@ checkpoints/*
 *.avi
 !assets/*.gif
 !assets/*.png
+!assets/*.mp4

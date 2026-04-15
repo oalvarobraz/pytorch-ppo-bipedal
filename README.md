@@ -16,6 +16,16 @@ O objetivo deste projeto não foi apenas "resolver" o ambiente usando biblioteca
 
 ---
 
+## 🏃‍♂️ Agente em Ação (Pós-Treinamento)
+
+<p align="center">
+  <video src="assets/bipedal_agent.mp4" width="600" controls muted autoplay loop></video>
+</p>
+
+*O vídeo demonstra o agente utilizando o cérebro treinado para coordenar os 4 motores das pernas, mantendo o equilíbrio do tronco e avançando pelo terreno procedural do Box2D.*
+
+---
+
 ## 🗂️ Estrutura do Projeto
 
 ```text
@@ -87,6 +97,14 @@ Após o esquecimento catastrófico, o agente descobriu uma brecha matemática na
 - **Ficar imóvel no chão:** ~**-40 pontos** (gastando mínimo de energia)
 
 **Conclusão do agente:** Como a Taxa de Aprendizado (LR Decay) decaiu e o agente perdeu a força de exploração necessária para se reerguer, a IA optou pelo **caminho de menor esforço e menor dor**. O modelo final estabilizou em uma estratégia de "preguiça", otimizando ativamente para tirar `-40` e evitar a dor absoluta da queda.
+
+### 🔹 5. A Cura da Preguiça e o "Suicídio da IA" (Reward Shaping)
+
+Para tirar a IA do Ótimo Local (ficar deitada no chão), apliquei uma técnica de **Reward Shaping**, penalizando a velocidade X se fosse muito baixa. 
+
+O resultado inesperado? O agente percebeu que ficar parado doía muito, mas tentar andar era difícil. Então, ele passou a **se jogar de cara no chão no primeiro segundo** de simulação ("Agent Suicide") para encerrar o episódio rapidamente e tomar apenas a penalidade base de queda (-100), fugindo da punição contínua.
+
+**A Solução Final:** Equilibrei o ecossistema matemático. Aumentei a penalidade de queda para `-500` e reduzi o coeficiente de entropia (para focar mais no *Exploitation* dos pesos que sabiam andar). O resultado (visto no vídeo do repositório) foi a recuperação da marcha funcional, provando que o comportamento da IA é apenas um reflexo implacável da sua função de recompensa!
 
 ---
 
